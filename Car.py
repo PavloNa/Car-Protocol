@@ -21,9 +21,8 @@ Status = b"1"
 clientSock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 clientSock.connect((UDP_IP_ADDRESS, UDP_PORT_NO))
 clientSock.settimeout(600)
+publicKey, privateKey = rsa.newkeys(512)
 
-#key = clientSock.recvfrom(1024)
-#clientSock.sendto(bytes(""), UDP_SEND)
 def checksum(message):
     Sum = str(sum(bytearray(message.encode('utf-8'))))
     return Sum
@@ -78,8 +77,9 @@ def updateSpeed():
         clientSock.sendto(Message, UDP_SEND)
     
 def carConnection():
-    Keyrequest = b'5'
-    clientSock.sendto(Keyrequest, UDP_SEND)
+    Keyrequest = "5!"
+    Keyrequest += str(publicKey)
+    clientSock.sendto(bytes(Keyrequest, encoding = 'utf-8'), UDP_SEND)
     key = clientSock.recvfrom(1024)
     key = key[0].decode('utf-8')
     print(key)

@@ -1,5 +1,6 @@
 # UDPPingerServer.py
 from email import message
+from inspect import CO_VARKEYWORDS
 import io
 import sys
 import random
@@ -23,6 +24,8 @@ global carSpeed
 carSpeed = {}
 global connect
 connect = False
+global carKey
+carKey = {}
 global publicKey, privateKey
 publicKey, privateKey = rsa.newkeys(512)
 
@@ -59,6 +62,7 @@ def newCar():
 	global carSpeed
 	global connect
 	global publicKey
+	global carKey
 	while True:
 		try:
 			connect = False
@@ -67,11 +71,16 @@ def newCar():
 			data1 = serverSocket.recvfrom(1024) #Recieve new car
 			c_message =  data1[0].decode("utf-8")
 			c_address = data1[1]
-			if c_message == "5":
+			separated = c_message.split("!") #Separate array
+			if separated[0] == "5":
 				serverSocket.sendto(bytes(str(publicKey), encoding = 'utf-8'), c_address)
+				if len(carKey) == 0:
+					carKey = {c_address: separated[1]}
+				else:
+					carKey[c_address] = str(separated[1])
 			else:
-				separated = c_message.split("!") #Separate array
-				#print(separated) Debugging
+				#print(carKey)
+				#print(separated)
 				#print(c_message) Debugging
 				if separated[0] == str(0):
 					check = separated[6]
